@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>클라이밍장 랜덤 룰렛</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f8f8f8;
+      padding: 20px;
+    }
+    canvas {
+      margin: 20px auto;
+      display: block;
+      transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    #spin {
+      font-size: 20px;
+      padding: 10px 30px;
+      margin-top: 10px;
+      border-radius: 10px;
+      background-color: #ff7b00;
+      color: white;
+      border: none;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    #map-link {
+      display: block;
+      margin-top: 10px;
+      font-size: 18px;
+      color: #0077cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>클라이밍장 랜덤 룰렛</h1>
+  <canvas id="wheel" width="400" height="400"></canvas>
+  <button id="spin">돌리기</button>
+  <div id="result"></div>
+  <a id="map-link" href="#" target="_blank"></a>
+
+  <script>
+    const gyms = [
+      { name: '더클라임 양재점', map: 'https://maps.app.goo.gl/ejCh5T7vNhYkHdQ58' },
+      { name: '더클라임 신사점', map: 'https://maps.app.goo.gl/8m8qUfd5bxxL9LY98' },
+      { name: '더클라임 논현점', map: 'https://maps.app.goo.gl/92k3qsmj6swZLycu9' },
+      { name: '더클라임 강남점', map: 'https://maps.app.goo.gl/Ah2wzN4PE7kGgxoM9' },
+      { name: '더클라임 연남점', map: 'https://maps.app.goo.gl/DZtSvQuAtW52a5sSA' },
+      { name: '더클라임 홍대점', map: 'https://maps.app.goo.gl/J5Sn1yXzXZRnpPQW7' },
+      { name: '더클라임 마곡점', map: 'https://maps.app.goo.gl/tPz7ydZChYXD4rZj9' },
+      { name: '더클라임 신림점', map: 'https://maps.app.goo.gl/b1sxh59BAXDhKDYSA' },
+      { name: '더클라임 서울대점', map: 'https://maps.app.goo.gl/YmYJUkAJbb7AJ2aa8' },
+      { name: '더클라임 사당점', map: 'https://maps.app.goo.gl/DXKWDC9TkqsZLuLn7' },
+      { name: '클라이밍파크 신논현', map: 'https://maps.app.goo.gl/pjW1Fwfr6pPMYcNz9' },
+      { name: '클라이밍파크 성수', map: 'https://maps.app.goo.gl/nAAkEUuThXZXXxDr9' },
+      { name: '클라이밍파크 종로', map: 'https://maps.app.goo.gl/FKcv8uNYNfQbDNxv5' },
+      { name: '클라이밍파크 한티', map: 'https://maps.app.goo.gl/t57qAfK9CAduYKLu5' },
+      { name: '클라이밍파크 강남', map: 'https://maps.app.goo.gl/qAU4Da9A6AHLG3FHA' },
+      { name: '서울숲클라이밍 잠실', map: 'https://maps.app.goo.gl/FSVwST3EdEKk9LTB9' },
+      { name: '서울숲클라이밍 구로', map: 'https://maps.app.goo.gl/qdeCptPyXzLUFiZw6' },
+      { name: '피커스 종로', map: 'https://maps.app.goo.gl/MUaePtPKPfEp9Mgq8' },
+      { name: '피커스 신촌', map: 'https://maps.app.goo.gl/9QJ5aJ4XqBgRcY2A6' },
+      { name: '피커스 구로', map: 'https://maps.app.goo.gl/SRiknS5X7NtzqMbd7' }
+    ];
+
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.width / 2;
+    const spinBtn = document.getElementById('spin');
+    const resultDiv = document.getElementById('result');
+    const mapLink = document.getElementById('map-link');
+
+    let rotation = 0;
+
+    function drawWheel() {
+      const angle = (2 * Math.PI) / gyms.length;
+      for (let i = 0; i < gyms.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.fillStyle = `hsl(${(i * 360) / gyms.length}, 80%, 70%)`;
+        ctx.arc(radius, radius, radius, angle * i, angle * (i + 1));
+        ctx.fill();
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(angle * (i + 0.5));
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#333';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(gyms[i].name, radius - 10, 5);
+        ctx.restore();
+      }
+    }
+
+    drawWheel();
+
+    function spinWheel() {
+      const selected = Math.floor(Math.random() * gyms.length);
+      const degreesPerSlice = 360 / gyms.length;
+      const stopAngle = 360 * 5 + (360 - selected * degreesPerSlice - degreesPerSlice / 2);
+
+      canvas.style.transform = `rotate(${stopAngle}deg)`;
+
+      setTimeout(() => {
+        resultDiv.innerText = `${gyms[selected].name} 당첨!`;
+        mapLink.href = gyms[selected].map;
+        mapLink.innerText = '📍 지도에서 보기';
+      }, 3100);
+    }
+
+    spinBtn.addEventListener('click', spinWheel);
+  </script>
+</body>
+</html>
