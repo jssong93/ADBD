@@ -18,11 +18,17 @@
       height: 400px;
       margin: 0 auto;
     }
-    canvas {
+    .rotating-group {
       position: absolute;
+      width: 100%;
+      height: 100%;
       top: 0;
       left: 0;
       transition: transform 3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
     }
     .center-icon {
       position: absolute;
@@ -31,7 +37,6 @@
       width: 100px;
       height: 100px;
       transform: translate(-50%, -50%);
-      z-index: 10;
       pointer-events: none;
     }
     #spin {
@@ -55,7 +60,7 @@
       color: #0077cc;
     }
     #count {
-      margin-top: 20px;
+      margin-top: 10px;
       font-size: 16px;
       color: #333;
     }
@@ -64,13 +69,15 @@
 <body>
   <h1>클라이밍장 랜덤 룰렛</h1>
   <div class="wheel-container">
-    <canvas id="wheel" width="400" height="400"></canvas>
-    <img src="./roulette_center_icon_cropped.png" alt="룰렛 아이콘" class="center-icon" />
+    <div id="rotator" class="rotating-group">
+      <canvas id="wheel" width="400" height="400"></canvas>
+      <img src="./roulette_center_icon_cropped.png" alt="룰렛 아이콘" class="center-icon" />
+    </div>
   </div>
   <button id="spin">돌리기</button>
   <div id="result"></div>
   <a id="map-link" href="#" target="_blank"></a>
-  <div id="count"></div>
+  <div id="count">오늘 돌린 횟수: 0회</div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -104,6 +111,7 @@
       const resultDiv = document.getElementById('result');
       const mapLink = document.getElementById('map-link');
       const countDiv = document.getElementById('count');
+      const rotator = document.getElementById('rotator');
 
       function drawWheel() {
         const angle = (2 * Math.PI) / gyms.length;
@@ -150,7 +158,7 @@
         const degreesPerSlice = 360 / gyms.length;
         const stopAngle = 360 * 5 + (360 - selected * degreesPerSlice - degreesPerSlice / 2);
 
-        canvas.style.transform = `rotate(${stopAngle}deg)`;
+        rotator.style.transform = `rotate(${stopAngle}deg)`;
 
         setTimeout(() => {
           resultDiv.innerText = `${gyms[selected].name} 당첨!`;
